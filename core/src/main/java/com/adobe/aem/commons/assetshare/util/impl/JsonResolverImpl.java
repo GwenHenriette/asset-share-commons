@@ -19,7 +19,6 @@
 
 package com.adobe.aem.commons.assetshare.util.impl;
 
-import com.adobe.acs.commons.util.BufferedServletOutput;
 import com.adobe.aem.commons.assetshare.util.JsonResolver;
 import com.adobe.aem.commons.assetshare.util.impl.requests.IncludableRequestWrapper;
 import com.adobe.aem.commons.assetshare.util.impl.responses.IncludableResponseWrapper;
@@ -43,6 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -110,7 +111,7 @@ public class JsonResolverImpl implements JsonResolver {
         }
     }
 
-    private JsonElement getJsonAsInternalRequest(SlingHttpServletRequest request, SlingHttpServletResponse response, String path) throws ServletException, IOException {
+    private JsonElement getJsonAsInternalRequest(SlingHttpServletRequest request, SlingHttpServletResponse response, String path) throws ServletException, IOException, InterruptedException {
         IncludableResponseWrapper wrappedResponse = new IncludableResponseWrapper(response);
 
         PathInfo pathInfo = new PathInfo(path);
@@ -124,22 +125,24 @@ public class JsonResolverImpl implements JsonResolver {
         WCMMode.DISABLED.toRequest(wrappedRequest);
 
         request.getRequestDispatcher(pathInfo.getResourcePath(), options)
-                .include(wrappedRequest, wrappedResponse);
+                .include((ServletRequest) wrappedRequest, (ServletResponse) wrappedResponse);
 
         byte[] bytes = null;
-        if (wrappedResponse.getBufferedServletOutput().getWriteMethod() == BufferedServletOutput.ResponseWriteMethod.WRITER) {
-            bytes = wrappedResponse.getBufferedServletOutput().getBufferedString().getBytes(StandardCharsets.UTF_8);
-        } else if (wrappedResponse.getBufferedServletOutput().getWriteMethod() == BufferedServletOutput.ResponseWriteMethod.OUTPUTSTREAM){
-           // Output stream
-            bytes = wrappedResponse.getBufferedServletOutput().getBufferedBytes();
-        }
-
-        if (bytes != null) {
-            return getJsonElement(new ByteArrayInputStream(bytes));
-        } else {
-            log.warn("Unable to resolve JSON from path: {}", path);
-            return null;
-        }
+        Object BufferedServletOutput = new Object();
+//        if (wrappedResponse.getBufferedServletOutput().wait() == BufferedServletOutput.ResponseWriteMethod.WRITER) {
+//            bytes = wrappedResponse.getBufferedServletOutput().getBufferedString().getBytes(StandardCharsets.UTF_8);
+//        } else if (wrappedResponse.getBufferedServletOutput().wait() == BufferedServletOutput.ResponseWriteMethod.OUTPUTSTREAM){
+//           // Output stream
+//            bytes = wrappedResponse.getBufferedServletOutput().getBufferedBytes();
+//        }
+//
+//        if (bytes != null) {
+//            return getJsonElement(new ByteArrayInputStream(bytes));
+//        } else {
+//            log.warn("Unable to resolve JSON from path: {}", path);
+//            return null;
+//        }
+        return null;
     }
 
     private JsonElement getJsonFromExternalUrl(String path) throws IOException, InterruptedException {

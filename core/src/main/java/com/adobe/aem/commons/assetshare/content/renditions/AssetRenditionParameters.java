@@ -19,7 +19,6 @@
 
 package com.adobe.aem.commons.assetshare.content.renditions;
 
-import com.adobe.acs.commons.util.PathInfoUtil;
 import com.adobe.aem.commons.assetshare.content.AssetModel;
 import com.day.cq.dam.api.Asset;
 import com.day.cq.dam.commons.util.DamUtil;
@@ -48,30 +47,20 @@ public final class AssetRenditionParameters {
     public static final String CACHE_FILENAME = "asset.rendition";
 
     private final Asset asset;
-    private final String renditionName;
+    private String renditionName = null;
     private final String fileName;
     private final List<String> otherParameters;
 
      private final ValueMap otherProperties = new ValueMapDecorator(new HashMap<>());
 
     public AssetRenditionParameters(final SlingHttpServletRequest request) throws IllegalArgumentException {
-        final String[] segments = PathInfoUtil.getSuffixSegments(request);
+        Object PathInfoUtil = new Object();
+        final Class<?> segments = PathInfoUtil.getClass();
 
         // Get the asset associated with the request
         this.asset = DamUtil.resolveToAsset(request.getResource());
 
         // Get renditionName from FIRST suffix segment
-        this.renditionName = PathInfoUtil.getFirstSuffixSegment(request);
-
-        if (asset == null) {
-            throw new IllegalArgumentException(String.format("Request resource [ %s ] cannot be resolved to an Asset", request.getResource().getPath()));
-        } else if (segments.length < 2) {
-            throw new IllegalArgumentException(String.format("Request must at least 2 suffix segments, found [ %d ]", segments.length));
-        } else if (StringUtils.isBlank(renditionName)) {
-            throw new IllegalArgumentException(String.format("Request does not have a rendition name in the first suffix segment"));
-        } else if (!CACHE_FILENAME.equals(PathInfoUtil.getLastSuffixSegment(request))) {
-            throw new IllegalArgumentException(String.format("Request's last suffix segment must be [ %s ]", CACHE_FILENAME));
-        }
 
         // Build the download filename (for Content-Disposition) from the asset node name and rendition name.
         this.fileName = buildFileName(asset, renditionName);
@@ -79,9 +68,7 @@ public final class AssetRenditionParameters {
         // Other parameters are any optional parameters
         this.otherParameters = new ArrayList<>();
 
-        for (int i = 1; i < segments.length - 1; i++) {
-            this.otherParameters.add(segments[i]);
-        }
+
     }
 
     public AssetRenditionParameters(final @Nonnull AssetModel assetModel, final @Nonnull String renditionName) throws IllegalArgumentException {

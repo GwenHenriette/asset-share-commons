@@ -110,7 +110,7 @@ public class AssetRenditionStreamerImpl implements AssetRenditionStreamer {
 
         for (final AssetRenditionDispatcher assetRenditionDispatcher : assetRenditionDispatchers.getAssetRenditionDispatchers()) {
             if (acceptedByAssetRenditionDispatcher(assetRenditionDispatcher, new AssetRenditionParameters(assetRenditionRequest))) {
-                assetRenditionDispatcher.dispatch(assetRenditionRequest, assetRenditionResponse);
+                assetRenditionDispatcher.dispatch((SlingHttpServletRequest) assetRenditionRequest, (SlingHttpServletResponse) assetRenditionResponse);
                 break;
             }
         }

@@ -113,7 +113,7 @@ public class AssetRenditionsDataSource extends SlingSafeMethodsServlet {
         dataSourceBuilder.build(request, data);
     }
 
-    private boolean acceptsAssetRenditionDispatcher(List<String> allowedAssetRenditionTypes, Set<String> excludeAssetRenditionDispatchers, AssetRenditionDispatcher assetRenditionDispatcher) {
+    private boolean acceptsAssetRenditionDispatcher(List<String> allowedAssetRenditionTypes, Set<String> RenditionDispatchers, AssetRenditionDispatcher assetRenditionDispatcher) {
         if (!assetRenditionDispatcher.getTypes().isEmpty() &&
                 !allowedAssetRenditionTypes.isEmpty() &&
                 Collections.disjoint(assetRenditionDispatcher.getTypes(), allowedAssetRenditionTypes)) {
@@ -130,7 +130,7 @@ public class AssetRenditionsDataSource extends SlingSafeMethodsServlet {
                 log.debug("Skip adding AssetRenditionDispatcher factory [ {} ] to Data Source as it has been marked as hidden via configuration", assetRenditionDispatcher.getName());
             }
             return false;
-        } else if (excludeAssetRenditionDispatchers.contains(assetRenditionDispatcher.getName())) {
+        } else if (RenditionDispatchers.contains(assetRenditionDispatcher.getName())) {
             if (log.isDebugEnabled()) {
                 log.debug("Skip adding AssetRenditionDispatcher factory [ {} ] to Data Source as it has been excluded via configuration", assetRenditionDispatcher.getName());
             }

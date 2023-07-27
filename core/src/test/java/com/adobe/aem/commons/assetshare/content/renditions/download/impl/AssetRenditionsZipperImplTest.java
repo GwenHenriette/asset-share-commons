@@ -184,7 +184,7 @@ public class AssetRenditionsZipperImplTest {
 
         AssetModel asset = modelFactory.getModelFromWrappedRequest(ctx.request(), ctx.resourceResolver().getResource("/content/dam/test.png"), AssetModel.class);
 
-        final String actual = zipper.getZipEntryName("", asset, "my-rendition", "image/png", new HashSet<>());
+        final String actual = zipper.getZipEntryName(new Param("", asset, "my-rendition", "image/png", new HashSet<>()));
 
         assertEquals( expected, actual);
     }
@@ -204,7 +204,7 @@ public class AssetRenditionsZipperImplTest {
 
         AssetModel asset = modelFactory.getModelFromWrappedRequest(ctx.request(), ctx.resourceResolver().getResource("/content/dam/test.png"), AssetModel.class);
 
-        final String actual = zipper.getZipEntryName("", asset, "my-rendition", "image/png", zipEntryFileNames);
+        final String actual = zipper.getZipEntryName(new Param("", asset, "my-rendition", "image/png", zipEntryFileNames));
 
         assertEquals( expected, actual);
     }

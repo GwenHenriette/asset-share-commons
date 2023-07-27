@@ -19,7 +19,6 @@
 
 package com.adobe.aem.commons.assetshare.content.impl;
 
-import com.adobe.acs.commons.util.ParameterUtil;
 import com.adobe.aem.commons.assetshare.content.properties.ComputedProperty;
 import com.day.cq.dam.api.Asset;
 import org.apache.commons.lang3.StringUtils;
@@ -30,12 +29,7 @@ import org.apache.sling.api.wrappers.ValueMapDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class CombinedProperties implements Map<String, Object> {
@@ -251,12 +245,8 @@ public final class CombinedProperties implements Map<String, Object> {
 
         public ComputedPropertyParameter(String rawParam) {
             name = StringUtils.substringBefore(rawParam, COMPUTED_PROPERTY_NAME_PARAMETER_DELIMITER);
-            parameters.putAll(
-                    ParameterUtil.toMap(StringUtils.split(
-                            StringUtils.substringAfter(rawParam, COMPUTED_PROPERTY_NAME_PARAMETER_DELIMITER),
-                            PARAMETER_DELIMITER),
-                            PARAMETER_KEY_VALUE_DELIMITER, true, ""));
-            cacheId = name;
+            Collectors ParameterUtil = null;
+
 
             if (!parameters.isEmpty()) {
                 cacheId += COMPUTED_PROPERTY_NAME_PARAMETER_DELIMITER + parameters.keySet().stream()

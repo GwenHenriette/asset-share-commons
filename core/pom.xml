@@ -50,6 +50,11 @@
         </pluginManagement>
         <plugins>
             <plugin>
+                <groupId>com.adobe.aem.commons</groupId>
+                <artifactId>assetshare</artifactId>
+                <version></version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.sling</groupId>
                 <artifactId>sling-maven-plugin</artifactId>
             </plugin>

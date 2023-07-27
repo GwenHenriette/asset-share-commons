@@ -101,6 +101,18 @@ public class AssetRenditionsZipperImpl implements AssetRenditionsDownloadOrchest
         final Set<String> zipEntryFileNames = new HashSet<>();
         final Set<String> zipEntryFolderNames = new HashSet<>();
 
+        size = getSize(request, response, assets, renditionNames, zipOutputStream, groupAssetRenditionsByFolder, size, zipEntryFileNames, zipEntryFolderNames);
+
+        if (size == 0) {
+            final String fileName = request.getResource().getValueMap().get(PN_NO_CONTENT_FILE_NAME, String.class);
+            String message = request.getResource().getValueMap().get(PN_NO_CONTENT_MESSAGE, String.class);
+            addNoContentFile(fileName, message, zipOutputStream);
+        }
+
+        zipOutputStream.close();
+    }
+
+    private long getSize(SlingHttpServletRequest request, SlingHttpServletResponse response, List<AssetModel> assets, List<String> renditionNames, ZipOutputStream zipOutputStream, boolean groupAssetRenditionsByFolder, long size, Set<String> zipEntryFileNames, Set<String> zipEntryFolderNames) throws IOException {
         for (final AssetModel asset : assets) {
             String folderName = null;
 
@@ -124,7 +136,7 @@ public class AssetRenditionsZipperImpl implements AssetRenditionsDownloadOrchest
                             zipEntryFolderNames.add(folderName);
                         }
 
-                        final String zipEntryName = getZipEntryName(folderName, asset, renditionName, stream.getContentType(), zipEntryFileNames);
+                        final String zipEntryName = getZipEntryName(new Param(folderName, asset, renditionName, stream.getContentType(), zipEntryFileNames));
 
                         addAssetRenditionAsZipEntry(folderName, zipEntryName, zipOutputStream, stream.getOutputStream());
                     }
@@ -141,14 +153,7 @@ public class AssetRenditionsZipperImpl implements AssetRenditionsDownloadOrchest
                 }
             }
         }
-
-        if (size == 0) {
-            final String fileName = request.getResource().getValueMap().get(PN_NO_CONTENT_FILE_NAME, String.class);
-            String message = request.getResource().getValueMap().get(PN_NO_CONTENT_MESSAGE, String.class);
-            addNoContentFile(fileName, message, zipOutputStream);
-        }
-
-        zipOutputStream.close();
+        return size;
     }
 
     @Override
@@ -171,28 +176,27 @@ public class AssetRenditionsZipperImpl implements AssetRenditionsDownloadOrchest
         return fileName;
     }
 
-    protected String getZipEntryName(final String folderName, final AssetModel asset, final String renditionName,
-                                     final String responseContentType, final Set<String> zipEntryFileNames) {
-        final String extension = mimeTypeService.getExtension(responseContentType);
+    protected String getZipEntryName(Param param) {
+        final String extension = mimeTypeService.getExtension(param.getResponseContentType());
 
         final Map<String, String> variables = new LinkedHashMap<>();
 
-        variables.put(VAR_ASSET_FILE_NAME, asset.getName());
-        variables.put(VAR_ASSET_NAME, StringUtils.substringBeforeLast(asset.getName(), "."));
-        variables.put(VAR_ASSET_TITLE, asset.getTitle());
-        variables.put(VAR_ASSET_EXTENSION, StringUtils.substringAfterLast(asset.getName(), "."));
-        variables.put(VAR_RENDITION_NAME, renditionName);
+        variables.put(VAR_ASSET_FILE_NAME, param.getAsset().getName());
+        variables.put(VAR_ASSET_NAME, StringUtils.substringBeforeLast(param.getAsset().getName(), "."));
+        variables.put(VAR_ASSET_TITLE, param.getAsset().getTitle());
+        variables.put(VAR_ASSET_EXTENSION, StringUtils.substringAfterLast(param.getAsset().getName(), "."));
+        variables.put(VAR_RENDITION_NAME, param.getRenditionName());
         variables.put(VAR_RENDITION_EXTENSION, extension);
 
         String zipEntryName = StringUtils.replaceEach(cfg.rendition_filename_expression(),
                 variables.keySet().toArray(new String[variables.keySet().size()]),
                 variables.values().toArray(new String[variables.values().size()]));
 
-        zipEntryName = generateUniqueZipEntry(zipEntryName, zipEntryFileNames);
-        if (folderName != null) {
-            zipEntryFileNames.add(folderName + "/" + zipEntryName);
+        zipEntryName = generateUniqueZipEntry(zipEntryName, param.getZipEntryFileNames());
+        if (param.getFolderName() != null) {
+            param.getZipEntryFileNames().add(param.getFolderName() + "/" + zipEntryName);
         } else {
-            zipEntryFileNames.add(zipEntryName);
+            param.getZipEntryFileNames().add(zipEntryName);
         }
 
         return zipEntryName;

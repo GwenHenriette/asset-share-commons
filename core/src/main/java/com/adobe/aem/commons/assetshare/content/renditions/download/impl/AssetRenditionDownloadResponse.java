@@ -19,13 +19,16 @@
 
 package com.adobe.aem.commons.assetshare.content.renditions.download.impl;
 
-import com.adobe.acs.commons.util.BufferedSlingHttpServletResponse;
+//import com.adobe.acs.commons.util.BufferedSlingHttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletResponse;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutput;
 import java.io.StringWriter;
+
+import static org.apache.http.HttpStatus.SC_OK;
 
 public class AssetRenditionDownloadResponse extends BufferedSlingHttpServletResponse {
     private String redirectLocation = null;
@@ -48,13 +51,13 @@ public class AssetRenditionDownloadResponse extends BufferedSlingHttpServletResp
         return redirectLocation;
     }
 
-    @Override
+
     public void sendRedirect(String location) {
         this.redirect = true;
         this.redirectLocation = location;
     }
 
-    @Override
+
     public void setStatus(int statusCode) {
         this.statusCode = statusCode;
 
@@ -63,7 +66,7 @@ public class AssetRenditionDownloadResponse extends BufferedSlingHttpServletResp
         }
     }
 
-    @Override
+
     public void setHeader(String key, String value) {
         if ("Location".equals(key)) {
             redirectLocation = value;
@@ -75,12 +78,12 @@ public class AssetRenditionDownloadResponse extends BufferedSlingHttpServletResp
         // Else ignore
     }
 
-    @Override
+
     public void sendError(int statusCode) {
         this.statusCode = statusCode;
     }
 
-    @Override
+
     public void sendError(int statusCode, String msg) {
         this.statusCode = statusCode;
     }
@@ -93,14 +96,18 @@ public class AssetRenditionDownloadResponse extends BufferedSlingHttpServletResp
         return statusCode;
     }
 
-    @Override
+
     public String getContentType() {
-        return StringUtils.defaultIfEmpty(contentType, super.getContentType());
+        return StringUtils.defaultIfEmpty(contentType, super.getContentType().toString());
     }
 
-    @Override
+
     public void setContentLength(int contentLength) {
         this.contentLength = contentLength;
+    }
+
+    public DataOutput getOutputStream() {
+        return null;
     }
 }
 
